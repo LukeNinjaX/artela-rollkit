@@ -127,7 +127,18 @@ func startInProcess[T sdktypes.Application](svrCtx *server.Context, svrCfg serve
 		}
 	}
 
-	grpcSrv, clientCtx, err := startGrpcServer(ctx, g, svrCfg.GRPC, clientCtx, svrCtx, app)
+	// always register the services, since aspect estimatedGas and aspect context are rely on it.
+	if tmNode != nil {
+		// re-assign for making the client available below
+		// do not use := to avoid shadowing clientCtx
+		clientCtx = clientCtx.WithClient(local.New(tmNode))
+
+		app.RegisterTxService(clientCtx)
+		app.RegisterTendermintService(clientCtx)
+		app.RegisterNodeService(clientCtx)
+	}
+
+	metrics, err := startTelemetry(config.Config)
 	if err != nil {
 		return err
 	}
@@ -151,8 +162,8 @@ func startInProcess[T sdktypes.Application](svrCtx *server.Context, svrCfg serve
 
 	if appcfg.JSONRPC.Enable {
 		tmEndpoint := "/websocket"
-		tmRPCAddr := cmtCfg.RPC.ListenAddress
-		jsonrpcSrv, err = CreateJSONRPC(svrCtx, clientCtx, tmRPCAddr, tmEndpoint, &appcfg)
+		tmRPCAddr := cfg.RPC.ListenAddress
+		jsonrpcSrv, err = CreateJSONRPC(ctx, clientCtx, tmRPCAddr, tmEndpoint, &config, db)
 		if err != nil {
 			return err
 		}

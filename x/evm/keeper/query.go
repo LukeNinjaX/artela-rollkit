@@ -22,6 +22,9 @@ import (
 
 	ethparams "github.com/ethereum/go-ethereum/params"
 
+	"github.com/artela-network/artela-evm/tracers"
+	"github.com/artela-network/artela-evm/tracers/logger"
+	"github.com/artela-network/artela-evm/vm"
 	artela "github.com/artela-network/artela-rollkit/ethereum/types"
 	artelatypes "github.com/artela-network/artela-rollkit/x/evm/artela/types"
 	"github.com/artela-network/artela-rollkit/x/evm/states"
