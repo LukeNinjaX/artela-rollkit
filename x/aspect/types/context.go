@@ -1,28 +1,26 @@
 package types
 
 import (
+	"cosmossdk.io/core/store"
+	"cosmossdk.io/log"
 	"github.com/artela-network/artela-evm/vm"
-	"github.com/cometbft/cometbft/libs/log"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 )
 
 type storeContext struct {
-	cosmosCtx      sdk.Context
-	aspectStoreKey storetypes.StoreKey
-	eVMStoreKey    storetypes.StoreKey
-	gas            uint64
+	cosmosCtx    sdk.Context
+	storeService store.KVStoreService
+	gas          uint64
 
 	chargeGas bool
 }
 
 func (s *storeContext) clone() StoreContext {
 	return &storeContext{
-		cosmosCtx:      s.cosmosCtx,
-		aspectStoreKey: s.aspectStoreKey,
-		eVMStoreKey:    s.eVMStoreKey,
-		gas:            s.gas,
+		cosmosCtx:    s.cosmosCtx,
+		storeService: s.storeService,
+		gas:          s.gas,
 	}
 }
 
@@ -34,12 +32,8 @@ func (s *storeContext) CosmosContext() sdk.Context {
 	return s.cosmosCtx
 }
 
-func (s *storeContext) AspectStoreKey() storetypes.StoreKey {
-	return s.aspectStoreKey
-}
-
-func (s *storeContext) EVMStoreKey() storetypes.StoreKey {
-	return s.eVMStoreKey
+func (s *storeContext) StoreService() store.KVStoreService {
+	return s.StoreService()
 }
 
 func (s *storeContext) Gas() uint64 {
@@ -65,8 +59,6 @@ func (s *storeContext) ConsumeGas(gas uint64) error {
 
 type StoreContext interface {
 	CosmosContext() sdk.Context
-	AspectStoreKey() storetypes.StoreKey
-	EVMStoreKey() storetypes.StoreKey
 	Gas() uint64
 	ConsumeGas(gas uint64) error
 	UpdateGas(gas uint64)
@@ -76,22 +68,20 @@ type StoreContext interface {
 	clone() StoreContext
 }
 
-func NewStoreContext(ctx sdk.Context, aspectStoreKey, evmStoreKey storetypes.StoreKey, gas uint64) StoreContext {
+func NewStoreContext(ctx sdk.Context, storeService store.KVStoreService, gas uint64) StoreContext {
 	return &storeContext{
-		cosmosCtx:      ctx,
-		aspectStoreKey: aspectStoreKey,
-		eVMStoreKey:    evmStoreKey,
-		gas:            gas,
-		chargeGas:      true,
+		cosmosCtx:    ctx,
+		storeService: storeService,
+		gas:          gas,
+		chargeGas:    true,
 	}
 }
 
-func NewGasFreeStoreContext(ctx sdk.Context, aspectStoreKey, evmStoreKey storetypes.StoreKey) StoreContext {
+func NewGasFreeStoreContext(ctx sdk.Context, storeService store.KVStoreService) StoreContext {
 	return &storeContext{
-		cosmosCtx:      ctx,
-		aspectStoreKey: aspectStoreKey,
-		eVMStoreKey:    evmStoreKey,
-		chargeGas:      false,
+		cosmosCtx:    ctx,
+		storeService: storeService,
+		chargeGas:    false,
 	}
 }
 

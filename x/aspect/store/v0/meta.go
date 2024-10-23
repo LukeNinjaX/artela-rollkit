@@ -4,8 +4,8 @@ import (
 	"math/big"
 	"strings"
 
+	"cosmossdk.io/store/prefix"
 	artelasdkType "github.com/artela-network/aspect-core/types"
-	"github.com/cosmos/cosmos-sdk/store/prefix"
 	"github.com/emirpasic/gods/sets/treeset"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/holiman/uint256"

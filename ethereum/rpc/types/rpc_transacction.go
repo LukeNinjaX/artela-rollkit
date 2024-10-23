@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/artela-network/artela-rollkit/x/evm/txs"
+	evmtypes "github.com/artela-network/artela-rollkit/x/evm/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -97,7 +97,7 @@ func newRPCTransactionWithFrom(tx *types.Transaction, blockHash common.Hash, blo
 // NewTransactionFromMsg returns a txs that will serialize to the RPC
 // representation, with the given location metadata set (if available).
 func NewTransactionFromMsg(
-	msg *txs.MsgEthereumTx,
+	msg *evmtypes.MsgEthereumTx,
 	blockHash common.Hash,
 	blockNumber, index uint64,
 	baseFee *big.Int,

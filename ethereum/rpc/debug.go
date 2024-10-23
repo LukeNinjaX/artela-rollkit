@@ -19,8 +19,8 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 
 	rpctypes "github.com/artela-network/artela-rollkit/ethereum/rpc/types"
-	evmtxs "github.com/artela-network/artela-rollkit/x/evm/txs"
 	"github.com/artela-network/artela-rollkit/x/evm/types"
+	evmtypes "github.com/artela-network/artela-rollkit/x/evm/types"
 )
 
 // TraceTransaction returns the structured logs created during the execution of EVM
@@ -146,13 +146,13 @@ func (b *BackendImpl) TraceTransaction(hash common.Hash, config *types.TraceConf
 func (b *BackendImpl) TraceBlock(height rpc.BlockNumber,
 	config *types.TraceConfig,
 	block *tmrpctypes.ResultBlock,
-) ([]*evmtxs.TxTraceResult, error) {
+) ([]*evmtypes.TxTraceResult, error) {
 	txs := block.Block.Txs
 	txsLength := len(txs)
 
 	if txsLength == 0 {
 		// If there are no transactions return empty array
-		return []*evmtxs.TxTraceResult{}, nil
+		return []*evmtypes.TxTraceResult{}, nil
 	}
 
 	txDecoder := b.clientCtx.TxConfig.TxDecoder()
@@ -208,7 +208,7 @@ func (b *BackendImpl) TraceBlock(height rpc.BlockNumber,
 		return nil, err
 	}
 
-	decodedResults := make([]*evmtxs.TxTraceResult, txsLength)
+	decodedResults := make([]*evmtypes.TxTraceResult, txsLength)
 	if err := json.Unmarshal(res.Data, &decodedResults); err != nil {
 		return nil, err
 	}

@@ -29,9 +29,7 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 
 	rpctypes "github.com/artela-network/artela-rollkit/ethereum/rpc/types"
-	"github.com/artela-network/artela-rollkit/x/evm/txs"
-	evmtxs "github.com/artela-network/artela-rollkit/x/evm/txs"
-	evmsupport "github.com/artela-network/artela-rollkit/x/evm/txs/support"
+	evmtypes "github.com/artela-network/artela-rollkit/x/evm/types"
 )
 
 // HandlerT keeps track of the cpu profiler and trace execution
@@ -148,7 +146,7 @@ func (api *DebugAPI) GetRawTransaction(ctx context.Context, hash common.Hash) (h
 
 		for _, pendingTx := range pendingTxs {
 			for _, msg := range (*pendingTx).GetMsgs() {
-				if ethMsg, ok := msg.(*txs.MsgEthereumTx); ok {
+				if ethMsg, ok := msg.(*evmtypes.MsgEthereumTx); ok {
 					if ethMsg.AsTransaction().Hash() == hash {
 						txMsg = ethMsg
 					}
@@ -193,13 +191,13 @@ func (api *DebugAPI) SetHead(_ hexutil.Uint64) {
 
 // TraceTransaction returns the structured logs created during the execution of EVM
 // and returns them as a JSON object.
-func (a *DebugAPI) TraceTransaction(hash common.Hash, config evmsupport.TraceConfig) (interface{}, error) {
+func (a *DebugAPI) TraceTransaction(hash common.Hash, config evmtypes.TraceConfig) (interface{}, error) {
 	return a.b.TraceTransaction(hash, &config)
 }
 
 // TraceBlockByNumber returns the structured logs created during the execution of
 // EVM and returns them as a JSON object.
-func (a *DebugAPI) TraceBlockByNumber(height rpc.BlockNumber, config evmsupport.TraceConfig) ([]*evmtxs.TxTraceResult, error) {
+func (a *DebugAPI) TraceBlockByNumber(height rpc.BlockNumber, config evmtypes.TraceConfig) ([]*evmtypes.TxTraceResult, error) {
 	a.logger.Debug("debug_traceBlockByNumber", "height", height)
 	if height == 0 {
 		return nil, errors.New("genesis is not traceable")
@@ -216,7 +214,7 @@ func (a *DebugAPI) TraceBlockByNumber(height rpc.BlockNumber, config evmsupport.
 
 // TraceBlockByHash returns the structured logs created during the execution of
 // EVM and returns them as a JSON object.
-func (a *DebugAPI) TraceBlockByHash(hash common.Hash, config evmsupport.TraceConfig) ([]*evmtxs.TxTraceResult, error) {
+func (a *DebugAPI) TraceBlockByHash(hash common.Hash, config evmtypes.TraceConfig) ([]*evmtypes.TxTraceResult, error) {
 	a.logger.Debug("debug_traceBlockByHash", "hash", hash)
 	// Get Tendermint Block
 	resBlock, err := a.b.CosmosBlockByHash(hash)
@@ -446,7 +444,7 @@ func (a *DebugAPI) SeedHash(_ uint64) (string, error) {
 
 // IntermediateRoots executes a block, and returns a list
 // of intermediate roots: the stateroot after each transaction.
-func (a *DebugAPI) IntermediateRoots(hash common.Hash, _ *evmsupport.TraceConfig) ([]common.Hash, error) {
+func (a *DebugAPI) IntermediateRoots(hash common.Hash, _ *evmtypes.TraceConfig) ([]common.Hash, error) {
 	a.logger.Debug("debug_intermediateRoots", "hash", hash)
 	return ([]common.Hash)(nil), nil
 }

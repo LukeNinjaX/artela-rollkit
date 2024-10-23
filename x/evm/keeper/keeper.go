@@ -24,15 +24,12 @@ import (
 	ethereum "github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/params"
 
-	artelatypes "github.com/artela-network/artela-rollkit/x/evm/artela/types"
-
-	"github.com/artela-network/artela-rollkit/common"
+	common2 "github.com/artela-network/artela-rollkit/common"
 	artela "github.com/artela-network/artela-rollkit/ethereum/types"
+	"github.com/artela-network/artela-rollkit/x/aspect/provider"
 	"github.com/artela-network/artela-rollkit/x/evm/artela/api"
-	"github.com/artela-network/artela-rollkit/x/evm/artela/provider"
 	artvmtype "github.com/artela-network/artela-rollkit/x/evm/artela/types"
 	"github.com/artela-network/artela-rollkit/x/evm/states"
-	"github.com/artela-network/artela-rollkit/x/evm/txs"
 	"github.com/artela-network/artela-rollkit/x/evm/types"
 )
 
@@ -76,6 +73,7 @@ type (
 	}
 )
 
+// NewKeeper generates new evm module keeper
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeService store.KVStoreService,
@@ -86,6 +84,7 @@ func NewKeeper(
 	feeKeeper types.FeeKeeper,
 	blockGetter types.BlockGetter,
 	chainIDGetter types.ChainIDGetter,
+	aspectProvider *provider.ArtelaProvider,
 	logger log.Logger,
 	authority string,
 
@@ -99,12 +98,6 @@ func NewKeeper(
 		panic("the EVM module account has not been set")
 	}
 
-	// init aspect
-	aspect := provider.NewArtelaProvider(storeService, artvmtype.GetLastBlockHeight(blockGetter), logger)
-	// new Aspect Runtime Context
-	aspectRuntimeContext := artvmtype.NewAspectRuntimeContext()
-	aspectRuntimeContext.Init(storeService)
-
 	// pass in the parameter space to the CommitStateDB in order to use custom denominations for the EVM operations
 	k := Keeper{
 		logger:                logger.With("module", fmt.Sprintf("x/%s", types.ModuleName)),
@@ -117,13 +110,12 @@ func NewKeeper(
 		storeService:          storeService,
 		transientStoreService: transientStoreService,
 		tracer:                "1",
-		aspectRuntimeContext:  aspectRuntimeContext,
-		aspect:                aspect,
+		aspect:                aspectProvider,
 		VerifySigCache:        new(sync.Map),
 		ChainIDGetter:         chainIDGetter,
 	}
 
-	djpm.NewAspect(aspect, common.WrapLogger(k.logger.With("module", "aspect")))
+	djpm.NewAspect(aspectProvider, common2.WrapLogger(k.logger.With("module", "aspect")))
 	api.InitAspectGlobals(&k)
 
 	// init aspect host api factory
@@ -198,7 +190,7 @@ func (k Keeper) EmitBlockBloomEvent(ctx sdk.Context, bloom ethereum.Bloom) {
 	encodedBloom := base64.StdEncoding.EncodeToString(bloom.Bytes())
 
 	sprintf := fmt.Sprintf("emit block event %d bloom %s header %d, ", len(bloom.Bytes()), encodedBloom, ctx.BlockHeight())
-	k.Logger().Info(sprintf)
+	k.Logger().Debug(sprintf)
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -374,7 +366,7 @@ func (k *Keeper) GetBalance(ctx sdk.Context, addr eth.Address) *big.Int {
 
 // Tracer return a default vm.Tracer based on current keeper states
 func (k Keeper) Tracer(ctx sdk.Context, msg *core.Message, ethCfg *params.ChainConfig) vm.EVMLogger {
-	return txs.NewTracer(k.tracer, msg, ethCfg, ctx.BlockHeight())
+	return types.NewTracer(k.tracer, msg, ethCfg, ctx.BlockHeight())
 }
 
 // GetBaseFee returns current base fee, return values:
@@ -415,7 +407,7 @@ func (k Keeper) ResetTransientGasUsed(ctx sdk.Context) {
 	k.Logger().Debug("setState: ResetTransientGasUsed, delete", "key", "KeyPrefixTransientGasUsed")
 }
 
-// GetTransientGasUsed returns the gas used by current cosmos txs.
+// GetTransientGasUsed returns the gas used by current cosmos types.
 func (k Keeper) GetTransientGasUsed(ctx sdk.Context) uint64 {
 	store := k.transientStoreService.OpenTransientStore(ctx)
 	bz, _ := store.Get(types.KeyPrefixTransientGasUsed)
@@ -425,7 +417,7 @@ func (k Keeper) GetTransientGasUsed(ctx sdk.Context) uint64 {
 	return sdk.BigEndianToUint64(bz)
 }
 
-// SetTransientGasUsed sets the gas used by current cosmos txs.
+// SetTransientGasUsed sets the gas used by current cosmos types.
 func (k Keeper) SetTransientGasUsed(ctx sdk.Context, gasUsed uint64) {
 	store := k.transientStoreService.OpenTransientStore(ctx)
 	bz := sdk.Uint64ToBigEndian(gasUsed)
@@ -438,7 +430,7 @@ func (k Keeper) SetTransientGasUsed(ctx sdk.Context, gasUsed uint64) {
 	)
 }
 
-// AddTransientGasUsed accumulate gas used by each eth msg included in current cosmos txs.
+// AddTransientGasUsed accumulate gas used by each eth msg included in current cosmos types.
 func (k Keeper) AddTransientGasUsed(ctx sdk.Context, gasUsed uint64) (uint64, error) {
 	result := k.GetTransientGasUsed(ctx) + gasUsed
 	if result < gasUsed {
@@ -451,11 +443,11 @@ func (k Keeper) AddTransientGasUsed(ctx sdk.Context, gasUsed uint64) (uint64, er
 
 // WithAspectContext creates the Aspect Context and establishes the link to the SDK context.
 func (k Keeper) WithAspectContext(ctx sdk.Context, tx *ethereum.Transaction,
-	evmConf *states.EVMConfig, block *artelatypes.EthBlockContext) (sdk.Context, *artelatypes.AspectRuntimeContext) {
-	ethTxContext := artelatypes.NewEthTxContext(tx)
+	evmConf *states.EVMConfig, block *artvmtype.EthBlockContext) (sdk.Context, *artvmtype.AspectRuntimeContext) {
+	ethTxContext := artvmtype.NewEthTxContext(tx)
 	ethTxContext.WithEVMConfig(evmConf)
 
-	aspectCtx := artelatypes.NewAspectRuntimeContext()
+	aspectCtx := artvmtype.NewAspectRuntimeContext()
 	protocol := provider.NewAspectProtocolProvider(aspectCtx.EthTxContext)
 	jitManager := inherent.NewManager(protocol)
 
@@ -463,5 +455,5 @@ func (k Keeper) WithAspectContext(ctx sdk.Context, tx *ethereum.Transaction,
 	aspectCtx.WithCosmosContext(ctx)
 	aspectCtx.SetEthBlockContext(block)
 	aspectCtx.CreateStateObject()
-	return ctx.WithValue(artelatypes.AspectContextKey, aspectCtx), aspectCtx
+	return ctx.WithValue(artvmtype.AspectContextKey, aspectCtx), aspectCtx
 }

@@ -13,7 +13,6 @@ import (
 	tmrpctypes "github.com/cometbft/cometbft/rpc/core/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/server"
-	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -31,7 +30,7 @@ import (
 	rpctypes "github.com/artela-network/artela-rollkit/ethereum/rpc/types"
 	"github.com/artela-network/artela-rollkit/ethereum/server/config"
 	ethereumtypes "github.com/artela-network/artela-rollkit/ethereum/types"
-	"github.com/artela-network/artela-rollkit/x/evm/txs"
+	evmtypes "github.com/artela-network/artela-rollkit/x/evm/types"
 	feetypes "github.com/artela-network/artela-rollkit/x/fee/types"
 )
 
@@ -156,7 +155,7 @@ func (b *BackendImpl) GetBalance(address common.Address, blockNrOrHash rpc.Block
 		return nil, err
 	}
 
-	req := &txs.QueryBalanceRequest{
+	req := &evmtypes.QueryBalanceRequest{
 		Address: address.String(),
 	}
 

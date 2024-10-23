@@ -13,9 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
 
-	"github.com/artela-network/artela-rollkit/x/evm/txs"
-	evmtxs "github.com/artela-network/artela-rollkit/x/evm/txs"
-	evmsupport "github.com/artela-network/artela-rollkit/x/evm/txs/support"
+	evmtypes "github.com/artela-network/artela-rollkit/x/evm/types"
 )
 
 type (
@@ -47,7 +45,7 @@ type (
 		Backend
 
 		GetProof(address common.Address, storageKeys []string, blockNrOrHash BlockNumberOrHash) (*AccountResult, error)
-		DoCall(args TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash) (*txs.MsgEthereumTxResponse, error)
+		DoCall(args TransactionArgs, blockNrOrHash rpc.BlockNumberOrHash) (*evmtypes.MsgEthereumTxResponse, error)
 		EstimateGas(ctx context.Context, args TransactionArgs, blockNrOrHash *rpc.BlockNumberOrHash) (hexutil.Uint64, error)
 
 		HeaderByNumber(ctx context.Context, number rpc.BlockNumber) (*types.Header, error)
@@ -70,7 +68,7 @@ type (
 		SendTx(ctx context.Context, signedTx *types.Transaction) error
 		GetTransaction(ctx context.Context, txHash common.Hash) (*RPCTransaction, error)
 		GetTransactionCount(address common.Address, blockNrOrHash rpc.BlockNumberOrHash) (*hexutil.Uint64, error)
-		GetTxMsg(ctx context.Context, txHash common.Hash) (*txs.MsgEthereumTx, error)
+		GetTxMsg(ctx context.Context, txHash common.Hash) (*evmtypes.MsgEthereumTx, error)
 		SignTransaction(args *TransactionArgs) (*types.Transaction, error)
 		GetTransactionReceipt(ctx context.Context, hash common.Hash) (map[string]interface{}, error)
 		RPCTxFeeCap() float64
@@ -79,18 +77,18 @@ type (
 		PendingTransactions() ([]*sdk.Tx, error)
 		GetResendArgs(args TransactionArgs, gasPrice *hexutil.Big, gasLimit *hexutil.Uint64) (TransactionArgs, error)
 		Sign(address common.Address, data hexutil.Bytes) (hexutil.Bytes, error)
-		GetSender(msg *txs.MsgEthereumTx, chainID *big.Int) (from common.Address, err error)
+		GetSender(msg *evmtypes.MsgEthereumTx, chainID *big.Int) (from common.Address, err error)
 	}
 
 	DebugBackend interface {
 		BlockChainBackend
 		TrancsactionBackend
 
-		TraceTransaction(hash common.Hash, config *evmsupport.TraceConfig) (interface{}, error)
+		TraceTransaction(hash common.Hash, config *evmtypes.TraceConfig) (interface{}, error)
 		TraceBlock(height rpc.BlockNumber,
-			config *evmsupport.TraceConfig,
+			config *evmtypes.TraceConfig,
 			block *tmrpctypes.ResultBlock,
-		) ([]*evmtxs.TxTraceResult, error)
+		) ([]*evmtypes.TxTraceResult, error)
 		GetReceipts(ctx context.Context, hash common.Hash) (types.Receipts, error)
 
 		DBProperty(property string) (string, error)

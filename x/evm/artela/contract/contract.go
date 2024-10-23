@@ -3,19 +3,15 @@ package contract
 import (
 	"strings"
 
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
-
 	errorsmod "cosmossdk.io/errors"
-	"github.com/cometbft/cometbft/libs/log"
+	"cosmossdk.io/log"
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/ethereum/go-ethereum/core"
 
 	"github.com/artela-network/artela-evm/vm"
-
 	"github.com/artela-network/artela-rollkit/common"
 	"github.com/artela-network/artela-rollkit/common/aspect"
-
 	"github.com/artela-network/artela-rollkit/x/evm/states"
 	evmtypes "github.com/artela-network/artela-rollkit/x/evm/types"
 )

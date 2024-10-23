@@ -7,7 +7,7 @@ import (
 	"math/big"
 	"time"
 
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	storetypes "cosmossdk.io/store/types"
 
 	asptool "github.com/artela-network/artela-rollkit/x/aspect/common"
 	"github.com/artela-network/artela-rollkit/x/aspect/store"

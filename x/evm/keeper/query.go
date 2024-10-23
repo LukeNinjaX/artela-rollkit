@@ -17,18 +17,13 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core"
 	ethereum "github.com/ethereum/go-ethereum/core/types"
+	ethparams "github.com/ethereum/go-ethereum/params"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	ethparams "github.com/ethereum/go-ethereum/params"
-
-	"github.com/artela-network/artela-evm/tracers"
-	"github.com/artela-network/artela-evm/tracers/logger"
-	"github.com/artela-network/artela-evm/vm"
 	artela "github.com/artela-network/artela-rollkit/ethereum/types"
 	artelatypes "github.com/artela-network/artela-rollkit/x/evm/artela/types"
 	"github.com/artela-network/artela-rollkit/x/evm/states"
-	"github.com/artela-network/artela-rollkit/x/evm/txs"
 	"github.com/artela-network/artela-rollkit/x/evm/types"
 )
 
@@ -421,7 +416,7 @@ func (k Keeper) TraceTx(c context.Context, req *types.QueryTraceTxRequest) (*typ
 		txConfig.TxIndex = uint(i)
 
 		isCustomVerification := k.isCustomizedVerification(ethTx)
-		rsp, err := k.ApplyMessageWithConfig(ctx, aspectCtx, msg, txs.NewNoOpTracer(), true, cfg, txConfig, isCustomVerification)
+		rsp, err := k.ApplyMessageWithConfig(ctx, aspectCtx, msg, types.NewNoOpTracer(), true, cfg, txConfig, isCustomVerification)
 		if err != nil {
 			aspectCtx.Destroy()
 			continue
@@ -490,11 +485,11 @@ func (k Keeper) TraceBlock(c context.Context, req *types.QueryTraceBlockRequest)
 	}
 	signer := ethereum.MakeSigner(cfg.ChainConfig, big.NewInt(ctx.BlockHeight()), uint64(ctx.BlockTime().Unix()))
 	txsLength := len(req.Txs)
-	results := make([]*txs.TxTraceResult, 0, txsLength)
+	results := make([]*types.TxTraceResult, 0, txsLength)
 
 	txConfig := states.NewEmptyTxConfig(common.BytesToHash(ctx.HeaderHash()))
 	for i, tx := range req.Txs {
-		result := txs.TxTraceResult{}
+		result := types.TxTraceResult{}
 		ethTx := tx.AsTransaction()
 		txConfig.TxHash = ethTx.Hash()
 		txConfig.TxIndex = uint(i)

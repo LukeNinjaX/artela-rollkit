@@ -18,7 +18,7 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 
 	"github.com/artela-network/artela-evm/vm"
-	"github.com/artela-network/artela-rollkit/x/evm/txs"
+	evmtypes "github.com/artela-network/artela-rollkit/x/evm/types"
 
 	rpctypes "github.com/artela-network/artela-rollkit/ethereum/rpc/types"
 	ethtypes "github.com/artela-network/artela-rollkit/ethereum/types"
@@ -760,7 +760,7 @@ func (s *TransactionAPI) PendingTransactions() ([]*rpctypes.RPCTransaction, erro
 	result := make([]*rpctypes.RPCTransaction, 0, len(pendingTxs))
 	for _, tx := range pendingTxs {
 		for _, msg := range (*tx).GetMsgs() {
-			if ethMsg, ok := msg.(*txs.MsgEthereumTx); ok {
+			if ethMsg, ok := msg.(*evmtypes.MsgEthereumTx); ok {
 				rpctx := rpctypes.NewTransactionFromMsg(ethMsg, common.Hash{}, uint64(0), uint64(0), nil, cfg)
 				result = append(result, rpctx)
 			}

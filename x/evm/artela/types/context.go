@@ -8,11 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"
-	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/runtime"
 	cosmos "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core"
@@ -24,9 +22,6 @@ import (
 	statedb "github.com/artela-network/artela-rollkit/x/evm/states"
 	inherent "github.com/artela-network/aspect-core/chaincoreext/jit_inherent"
 	artelatypes "github.com/artela-network/aspect-core/types"
-
-	statedb "github.com/artela-network/artela-rollkit/x/evm/states"
-	evmtypes "github.com/artela-network/artela-rollkit/x/evm/types"
 )
 
 const (

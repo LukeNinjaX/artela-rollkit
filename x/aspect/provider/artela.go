@@ -5,13 +5,12 @@ import (
 	"errors"
 	"slices"
 
-	asptypes "github.com/artela-network/aspect-core/types"
-
-	"github.com/artela-network/artela-rollkit/x/aspect/store"
+	"cosmossdk.io/core/store"
+	aspectStore "github.com/artela-network/artela-rollkit/x/aspect/store"
 	aspectmoduletypes "github.com/artela-network/artela-rollkit/x/aspect/types"
 	"github.com/artela-network/artela-rollkit/x/evm/artela/types"
+	asptypes "github.com/artela-network/aspect-core/types"
 
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -20,19 +19,16 @@ var _ asptypes.AspectProvider = (*ArtelaProvider)(nil)
 type ArtelaProvider struct {
 	getBlockHeight types.GetLastBlockHeight
 
-	evmStoreKey    storetypes.StoreKey
-	aspectStoreKey storetypes.StoreKey
+	storeService store.KVStoreService
 }
 
 func NewArtelaProvider(
-	evmStoreKey storetypes.StoreKey,
-	aspectStoreKey storetypes.StoreKey,
 	getBlockHeight types.GetLastBlockHeight,
+	storeService store.KVStoreService,
 ) *ArtelaProvider {
 	return &ArtelaProvider{
-		evmStoreKey:    evmStoreKey,
-		aspectStoreKey: aspectStoreKey,
 		getBlockHeight: getBlockHeight,
+		storeService:   storeService,
 	}
 }
 
@@ -57,7 +53,7 @@ func (j *ArtelaProvider) getCodes(ctx context.Context, address common.Address, p
 		return nil, errors.New("failed to unwrap AspectRuntimeContext from context.Context")
 	}
 
-	accountStore, _, err := store.GetAccountStore(j.buildAccountStoreCtx(aspectCtx, address))
+	accountStore, _, err := aspectStore.GetAccountStore(j.buildAccountStoreCtx(aspectCtx, address))
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +65,7 @@ func (j *ArtelaProvider) getCodes(ctx context.Context, address common.Address, p
 
 	codes := make([]*asptypes.AspectCode, 0, len(bindings))
 	for _, binding := range bindings {
-		metaStore, _, err := store.GetAspectMetaStore(j.buildAspectStoreCtx(aspectCtx, binding.Account))
+		metaStore, _, err := aspectStore.GetAspectMetaStore(j.buildAspectStoreCtx(aspectCtx, binding.Account))
 		if err != nil {
 			return nil, err
 		}
@@ -118,14 +114,14 @@ func (j *ArtelaProvider) getCodes(ctx context.Context, address common.Address, p
 
 func (j *ArtelaProvider) buildAspectStoreCtx(ctx *types.AspectRuntimeContext, aspectID common.Address) *aspectmoduletypes.AspectStoreContext {
 	return &aspectmoduletypes.AspectStoreContext{
-		StoreContext: aspectmoduletypes.NewGasFreeStoreContext(ctx.CosmosContext(), j.aspectStoreKey, j.evmStoreKey),
+		StoreContext: aspectmoduletypes.NewGasFreeStoreContext(ctx.CosmosContext(), j.storeService),
 		AspectID:     aspectID,
 	}
 }
 
 func (j *ArtelaProvider) buildAccountStoreCtx(ctx *types.AspectRuntimeContext, account common.Address) *aspectmoduletypes.AccountStoreContext {
 	return &aspectmoduletypes.AccountStoreContext{
-		StoreContext: aspectmoduletypes.NewGasFreeStoreContext(ctx.CosmosContext(), j.aspectStoreKey, j.evmStoreKey),
+		StoreContext: aspectmoduletypes.NewGasFreeStoreContext(ctx.CosmosContext(), j.storeService),
 		Account:      account,
 	}
 }

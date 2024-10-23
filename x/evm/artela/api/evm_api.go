@@ -15,7 +15,7 @@ import (
 
 	artelatypes "github.com/artela-network/artela-rollkit/x/evm/artela/types"
 	"github.com/artela-network/artela-rollkit/x/evm/states"
-	types "github.com/artela-network/artela-rollkit/x/evm/txs"
+	evmtypes "github.com/artela-network/artela-rollkit/x/evm/types"
 )
 
 var (
@@ -65,7 +65,7 @@ func (e *evmHostApi) StaticCall(ctx *asptypes.RunnerContext, request *asptypes.S
 			From: from,
 			To:   &to,
 			Data: request.Data,
-		}, evmConfig, types.NewNoOpTracer(), stateDB)
+		}, evmConfig, evmtypes.NewNoOpTracer(), stateDB)
 	}
 
 	// we cannot create any evm at this stage, return error

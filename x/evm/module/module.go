@@ -17,6 +17,11 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+
+	aspectmoduletypes "github.com/artela-network/artela-rollkit/x/aspect/types"
+	aspectmodule "github.com/artela-network/artela-rollkit/x/evm/artela/types"
+	aspecttypes "github.com/artela-network/aspect-core/types"
+
 	// this line is used by starport scaffolding # 1
 
 	modulev1 "github.com/artela-network/artela-rollkit/api/artela/evm/module"
@@ -205,6 +210,8 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 	if in.Config.Authority != "" {
 		authority = authtypes.NewModuleAddressOrBech32Address(in.Config.Authority)
 	}
+	// aspectmodule.InitStoreKeys(keys[evmmoduletypes.StoreKey], keys[aspectmoduletypes.StoreKey])
+	aspect := provider.NewArtelaProvider(app.LastBlockHeight, in.StoreService)
 	k := keeper.NewKeeper(
 		in.Cdc,
 		in.StoreService,
@@ -215,6 +222,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.FeeKeeper,
 		in.BlockGetter,
 		in.ChainIDGetter,
+		aspect,
 		in.Logger,
 		authority.String(),
 	)

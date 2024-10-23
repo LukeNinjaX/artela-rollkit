@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/artela-network/artela-rollkit/x/evm/txs"
+	evmtypes "github.com/artela-network/artela-rollkit/x/evm/types"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/log"
@@ -92,7 +92,7 @@ func (s *TxPoolAPI) getPendingContent(addr common.Address) map[string]map[string
 	}
 	for _, tx := range pendingTxs {
 		for _, msg := range (*tx).GetMsgs() {
-			if ethMsg, ok := msg.(*txs.MsgEthereumTx); ok {
+			if ethMsg, ok := msg.(*evmtypes.MsgEthereumTx); ok {
 				sender, err := s.b.GetSender(ethMsg, cfg.ChainID)
 				if err != nil {
 					s.logger.Debug("txpool_context, get pending transaction sender", "err", err.Error())
@@ -103,7 +103,7 @@ func (s *TxPoolAPI) getPendingContent(addr common.Address) map[string]map[string
 					continue
 				}
 
-				txData, err := txs.UnpackTxData(ethMsg.Data)
+				txData, err := evmtypes.UnpackTxData(ethMsg.Data)
 				if err != nil {
 					s.logger.Debug("txpool_context, unpack pending transaction failed", "err", err.Error())
 					continue

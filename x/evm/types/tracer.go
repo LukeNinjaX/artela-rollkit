@@ -1,4 +1,4 @@
-package txs
+package types
 
 import (
 	"math/big"

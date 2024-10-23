@@ -329,8 +329,8 @@ github.com/armon/go-radix v0.0.0-20180808171621-7fddfc383310/go.mod h1:ufUuZ+zHj
 github.com/armon/go-radix v1.0.0/go.mod h1:ufUuZ+zHj4x4TnLV4JWEpy2hxWSpsRywHrMgIH9cCH8=
 github.com/artela-network/artela-evm v0.4.8-rc8 h1:4saDqBKnVmaEvSBEveVwRi/vnXVERz5YvRXr3gAzB3E=
 github.com/artela-network/artela-evm v0.4.8-rc8/go.mod h1:eYeoqd8pOAX/HcKVKnqxqwJki0qyIoQwSGgYTyFZQ/M=
-github.com/artela-network/aspect-core v0.4.8-rc8 h1:7KSb/NcD3HhOTirVg7mVPmknxSO1xQooNjPHe4bryZc=
-github.com/artela-network/aspect-core v0.4.8-rc8/go.mod h1:hve/4ibuIgt0HaAQrBYez1O8BQGceK8O8rGeyHoMAwg=
+github.com/artela-network/aspect-core v0.4.9-rc9 h1:TC27Al1l/e0yjPTZ2F1b9VhoGw/8cCD9uxCimRBHq4k=
+github.com/artela-network/aspect-core v0.4.9-rc9/go.mod h1:hve/4ibuIgt0HaAQrBYez1O8BQGceK8O8rGeyHoMAwg=
 github.com/artela-network/aspect-runtime v0.4.8-rc8 h1:48dbWs+4wUAL52U6JUN+hPQ7u7lDTkajoI0EcZYtwL4=
 github.com/artela-network/aspect-runtime v0.4.8-rc8/go.mod h1:GiDB2+LUbl2b2Z8+v/83LFbUKs5DqQ3ACxLUWY8zMdU=
 github.com/artela-network/wasmtime-go/v20 v20.0.3 h1:A4/KrrCQiXhDibc3bUlvD7vzohV4saWiAA3MIFz11Yo=
@@ -588,6 +588,8 @@ github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZm
 github.com/dgryski/go-farm v0.0.0-20190423205320-6a90982ecee2/go.mod h1:SqUrOPUnsFjfmXRMNPybcSiG0BgUW2AuFH8PAnS2iTw=
 github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 h1:fAjc9m62+UWV/WAFKLNi6ZS0675eEUC9y3AlwSbQu1Y=
 github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13/go.mod h1:SqUrOPUnsFjfmXRMNPybcSiG0BgUW2AuFH8PAnS2iTw=
+github.com/dgryski/go-metro v0.0.0-20211217172704-adc40b04c140 h1:y7y0Oa6UawqTFPCDw9JG6pdKt4F9pAhHv0B7FMGaGD0=
+github.com/dgryski/go-metro v0.0.0-20211217172704-adc40b04c140/go.mod h1:c9O8+fpSOX1DM8cPNSkX/qsBWdkD4yd2dpciOWQjpBw=
 github.com/distribution/reference v0.5.0 h1:/FUIFXtfc/x2gpa5/VGfiGLuOIdYa1t65IKK2OFGvA0=
 github.com/distribution/reference v0.5.0/go.mod h1:BbU0aIcezP1/5jX/8MP0YiH4SdvB5Y4f/wlDRiLyi3E=
 github.com/dnaeon/go-vcr v1.2.0/go.mod h1:R4UdLID7HZT3taECzJs4YgbbH6PIGXB6W/sc5OLb6RQ=
